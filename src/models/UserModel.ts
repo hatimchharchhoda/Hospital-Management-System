@@ -4,6 +4,7 @@ export interface Usertype extends Document {
   username: string,
   email: string,
   password: string,
+  hospitalName: string,
 }
 const UserSchema: Schema<Usertype> = new mongoose.Schema({
     username: {
@@ -11,6 +12,11 @@ const UserSchema: Schema<Usertype> = new mongoose.Schema({
       required: [true, 'Username is required'],
       trim: true,
       unique: true,
+    },
+    hospitalName: {
+      type: String,
+      required: [true, 'Hospital name is required'],
+      trim: true,
     },
     email: {
       type: String,

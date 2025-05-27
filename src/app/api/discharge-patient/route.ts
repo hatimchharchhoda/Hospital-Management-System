@@ -3,9 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/options";
 import dbConnect from "@/lib/dbConnect";
 import PendingPatientsModel from "@/models/PendingPatientsModel";
-import PatientsRecordModel,{ AdmissionSummary } from "@/models/PatientsRecordModel";
+import PatientsRecordModel, { AdmissionSummary } from "@/models/PatientsRecordModel";
 
-export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+export async function POST(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session || !session.user?._id) {
@@ -13,100 +13,94 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
     }
 
     await dbConnect();
-
-    const patientId = params.id;
+    const { patientId } = await req.json();
     const hospitalId = session.user._id;
-    const currentDate = new Date();
+    console.log(patientId); 
+    const pendingPatient = await PendingPatientsModel.findOne({ _id:patientId, hospitalId });
 
-    const pendingPatient = await PendingPatientsModel.findOne({
-      patientId,
-      hospitalId,
-    });
-
-    // Prepare default admission summary values
-   let admissionSummary: AdmissionSummary = {
-      dateOfAdmission: currentDate,
-      dateOfDischarge: currentDate,
-      assignedDoctorName: null, // ✅ Now valid
-      doctorFees: 0,
-      bottleCost: 0,
-      roomCost: 0,
-      medicineCost: 0,
-      operationCost: 0,
-      otherCharges: 0,
-      totalBill: 0,
-   };
-    if (pendingPatient) {
-      if (pendingPatient.status === "discharged") {
-        return NextResponse.json({ success: false, message: "Patient already discharged" }, { status: 400 });
-      }
-
-      // Extract and calculate costs from treatment records
-      const treatmentRecords = pendingPatient.treatmentRecords;
-      let bottleCost = 0, medicineCost = 0, operationCost = 0, doctorFees = 0, otherCharges = 0, roomCost = 0;
-
-      for (const record of treatmentRecords) {
-        bottleCost += record.bottles?.price || 0;
-        operationCost += record.operationCost || 0;
-        doctorFees += record.doctorFees || 0;
-        otherCharges += record.otherCost || 0;
-
-        medicineCost += record.medicines?.reduce((sum, med) => {
-          const quantity = med.quantity || 0;
-          const price = med.price || 0;
-          return sum + quantity * price;
-        }, 0) || 0;
-
-        if (record.room?.roomPrice) {
-          roomCost += record.room.roomPrice;
-        }
-      }
-
-      const totalBill = doctorFees + bottleCost + roomCost + medicineCost + operationCost + otherCharges;
-
-      // Fill summary
-      admissionSummary = {
-        dateOfAdmission: pendingPatient.dateOfAdmission,
-        dateOfDischarge: currentDate,
-        assignedDoctorName: pendingPatient.assignedDoctorName || null,
-        doctorFees,
-        bottleCost,
-        roomCost,
-        medicineCost,
-        operationCost,
-        otherCharges,
-        totalBill,
-      };
+    if (!pendingPatient) {
+      return NextResponse.json({ success: false, message: "Pending patient not found." }, { status: 404 });
     }
 
-    // Check if this patient already exists in PatientsRecordModel under the same hospital
-    const existingRecord = await PatientsRecordModel.findOne({ patientId, hospitalId });
+    const patient = pendingPatient.patientId;
 
-    if (existingRecord) {
-      // Add new admission to existing patient record
-      existingRecord.admissions.push(admissionSummary);
-      await existingRecord.save();
+    if (pendingPatient.status === "discharged") {
+      return NextResponse.json({ success: false, message: "Patient already discharged" }, { status: 400 });
+    }
+
+    const treatmentRecords = pendingPatient.treatmentRecords || [];
+    if (treatmentRecords.length === 0) {
+      return NextResponse.json({ success: false, message: "No treatment records available." }, { status: 400 });
+    }
+
+    // Calculate costs
+    let doctorFees = 0, roomCost = 0, operationCost = 0, otherCharges = 0;
+    let bottleCost = 0, injectionCost = 0, medicineCost = 0;
+
+    for (const record of treatmentRecords) {
+      doctorFees += record.doctorFees || 0;
+      roomCost += record.room?.roomPrice || 0;
+      operationCost += record.operationCost || 0;
+      otherCharges += record.otherCost || 0;
+
+      bottleCost += (record.bottles?.count || 0) * (record.bottles?.price || 0);
+      injectionCost += (record.injections?.count || 0) * (record.injections?.price || 0);
+
+      if (record.medicines?.length) {
+        for (const med of record.medicines) {
+          medicineCost += (med.quantity || 0) * (med.price || 0);
+        }
+      }
+    }
+
+    const totalBill = doctorFees + roomCost + operationCost + otherCharges + bottleCost + injectionCost + medicineCost;
+
+    const dateOfAdmission = pendingPatient.dateOfAdmission;
+    const dateOfDischarge = treatmentRecords[treatmentRecords.length - 1].date || new Date();
+
+    const admissionSummary: AdmissionSummary = {
+      dateOfAdmission,
+      dateOfDischarge,
+      assignedDoctorName: pendingPatient.assignedDoctorName || null,
+      doctorFees,
+      roomCost,
+      operationCost,
+      otherCharges,
+      bottleCost,
+      medicineCost: medicineCost,
+      injectionCost: injectionCost, 
+      totalBill,
+    };
+
+    // Check if old patient
+    const existingPatient = await PatientsRecordModel.findOne({ patient, hospitalId });
+
+    if (existingPatient) {
+      existingPatient.admissions.push(admissionSummary);
+      existingPatient.name = pendingPatient.name;
+      existingPatient.mobile = pendingPatient.mobile;
+      existingPatient.address = pendingPatient.address;
+      await existingPatient.save();
     } else {
-      // Create new patient record
+      // New patient
       await PatientsRecordModel.create({
-        patientId,
-        name: pendingPatient?.name || "N/A",
-        address: pendingPatient?.address || "N/A",
-        mobile: pendingPatient?.mobile || "N/A",
+        patientId:patient,
         hospitalId,
+        name: pendingPatient.name,
+        mobile: pendingPatient.mobile,
+        address: pendingPatient.address,
         admissions: [admissionSummary],
       });
     }
 
-    // Delete the pending patient after successful discharge
-    if (pendingPatient) {
-      await PendingPatientsModel.findByIdAndDelete(pendingPatient._id);
-    }
+    // Remove from pending patients
+    await PendingPatientsModel.findByIdAndUpdate( pendingPatient._id, { status:"discharged" });
+    await PendingPatientsModel.findByIdAndDelete(pendingPatient._id);
 
-    return NextResponse.json({
-      success: true,
-      message: "Patient discharged, record saved, and removed from pending list.",
-    }, { status: 200 });
+    return NextResponse.json(
+      { success: true, message: "Patient discharged"},
+      { status: 200 }
+    );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {

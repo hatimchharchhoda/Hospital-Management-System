@@ -12,6 +12,7 @@ type CustomUser = {
   username: string;
   email: string;
   password: string;
+  hospitalName: string;
 };
 
 export const authOptions: NextAuthOptions = {
@@ -49,7 +50,8 @@ export const authOptions: NextAuthOptions = {
               _id: user._id.toString(),
               username: user.username,
               email: user.email,
-              password: user.password
+              password: user.password,
+              hospitalName: user.hospitalName,
             };
           } else {
             throw new Error('Incorrect password.');
@@ -67,6 +69,7 @@ export const authOptions: NextAuthOptions = {
         token._id = user._id?.toString();
         token.id = user.id; // Ensure `id` is mapped in the token
         token.username = user.username;
+        token.hospitalName = user.hospitalName;
       }
       return token;
     },
@@ -75,6 +78,7 @@ export const authOptions: NextAuthOptions = {
         session.user._id = token._id;
         session.user.id = token.id; // Ensure `id` is mapped in the session
         session.user.username = token.username;
+        session.user.hospitalName = token.hospitalName;
       }
       return session;
     },

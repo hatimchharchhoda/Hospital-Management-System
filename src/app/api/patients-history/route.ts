@@ -24,6 +24,7 @@ export async function GET() {
     const result: Record<
       string,
       {
+        _id: string;
         name: string;
         mobile: string;
         address: string;
@@ -33,14 +34,18 @@ export async function GET() {
 
     records.forEach((record) => {
       result[record.patientId] = {
+        _id: record._id.toString(),
         name: record.name,
         mobile: record.mobile,
         address: record.address,
-        admissions: record.admissions,
+        admissions: record.admissions.sort((a, b) =>
+          new Date(b.dateOfAdmission).getTime() - new Date(a.dateOfAdmission).getTime()
+        ),
       };
     });
 
     return NextResponse.json({ success: true, data: result }, { status: 200 });
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error("Error fetching patients:", error);

@@ -6,6 +6,7 @@ export interface AdmissionSummary {
   assignedDoctorName?: string | null; // Moved here
   doctorFees: number;
   bottleCost: number;
+  injectionCost: number;
   roomCost: number;
   medicineCost: number;
   operationCost: number;
@@ -28,6 +29,7 @@ const AdmissionSummarySchema = new Schema<AdmissionSummary>({
   assignedDoctorName: { type: String, default: null }, // Added here
   doctorFees: { type: Number, default: 0 },
   bottleCost: { type: Number, default: 0 },
+  injectionCost: { type: Number, default: 0 },
   roomCost: { type: Number, default: 0 },
   medicineCost: { type: Number, default: 0 },
   operationCost: { type: Number, default: 0 },

@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   await dbConnect();
   console.log("DB connected");
   try {
-    const { username, email, password } = await request.json();
+    const { username, email, password, hospitalName } = await request.json();
 
     const user = await UserModel.findOne({
       username
@@ -38,6 +38,7 @@ export async function POST(request: Request) {
         username,
         email,
         password: hashedPassword,
+        hospitalName,
       });
 
       await newUser.save();

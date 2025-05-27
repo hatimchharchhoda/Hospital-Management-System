@@ -12,7 +12,7 @@ interface Props {
 export default function NewTreatmentPopup({ patientId, onClose, onSuccess }: Props) {
   const [form, setForm] = useState<TreatmentRecord>({
     treatment_for: '',
-    date: new Date().toISOString(),
+    date: '',
     room: {
       roomNo: '',
       bedNo: '',
@@ -116,8 +116,13 @@ export default function NewTreatmentPopup({ patientId, onClose, onSuccess }: Pro
           />
         </div>
 
+        <div>
+          <label className="block text-sm font-medium">New Day Treatment</label>
+          <input type="date" name="date" className="w-full border px-3 py-1 rounded" value={form.date} onChange={handleChange} />
+        </div>
+
         {/* Room */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
+        <div className="grid grid-cols-2 gap-2 mb-3 py-2">
           <input
             placeholder="Room No"
             className="border px-3 py-1 rounded"
