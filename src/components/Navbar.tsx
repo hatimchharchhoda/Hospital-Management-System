@@ -134,14 +134,15 @@ const Navbar = () => {
             <Link href="/signin">
               <Button
                 variant="outline"
-                className="text-base text-[${colors.primary}] hover:bg-[${colors.accentAqua}] hover:text-white transition-colors duration-300"
+                className="text-base text-[${colors.primary}] hover:bg-yellow-100 hover:text-yellow-600 transition-colors duration-300"
               >
                 Sign In
               </Button>
             </Link>
             <Link href="/signup">
               <Button
-                className="text-base bg-[${colors.accentAqua}] hover:bg-[${colors.primary}] text-white transition-colors duration-300"
+                variant="outline"
+                className="text-base text-[${colors.primary}] hover:bg-yellow-100 hover:text-yellow-600 transition-colors duration-300"
               >
                 Sign Up
               </Button>
