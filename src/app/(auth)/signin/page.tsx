@@ -17,8 +17,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { signInSchema } from '@/schemas/signInSchema';
-import {  Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 
 export default function SignInForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,9 +46,10 @@ export default function SignInForm() {
     if (result?.error) {
       toast({
         title: 'Login Failed',
-        description: result.error === 'CredentialsSignin'
-          ? 'Incorrect username or password'
-          : result.error,
+        description:
+          result.error === 'CredentialsSignin'
+            ? 'Incorrect username or password'
+            : result.error,
         variant: 'destructive',
       });
       setIsSubmitting(false);
@@ -69,65 +71,93 @@ export default function SignInForm() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#e0f2fe] via-[#f8fafc] to-[#dbeafe] px-4">
-      <div className="relative w-full max-w-md p-8 space-y-6 bg-white/60 backdrop-blur-md border border-gray-200 rounded-3xl shadow-2xl transition-all duration-300 ease-in-out hover:scale-[1.01]">
+    <div
+      className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#F5F9FF] via-[#E8F0F7] to-[#D0E3F7] px-6"
+      aria-label="Sign in page background"
+    >
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="relative w-full max-w-md p-8 space-y-8 bg-white/70 backdrop-blur-sm border border-[#2E86AB] rounded-2xl shadow-lg"
+      >
         <div className="text-center">
-          <h1 className="text-5xl font-extrabold text-gray-800 tracking-tight mb-3 animate-fade-in">
-            TweetConnect
+          <h1
+            className="text-3xl md:text-4xl font-semibold text-[#1C1F26] mb-1 select-none"
+            aria-label="Welcome to MediConnect"
+          >
+            Welcome to MediConnect
           </h1>
-          <p className="text-gray-600 text-sm animate-slide-in">Connect. Express. Stay Updated.</p>
+          <p className="text-sm md:text-base text-[#517D9B] font-medium tracking-wide select-none">
+            Connect. Express. Stay Updated.
+          </p>
         </div>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 animate-fade-in-up">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6"
+            noValidate
+          >
             <FormField
               name="identifier"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 text-sm font-medium">Email or Username</FormLabel>
+                  <FormLabel className="text-sm text-[#517D9B] font-medium">
+                    Email or Username
+                  </FormLabel>
                   <Input
                     {...field}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
                     placeholder="you@example.com"
+                    className="w-full px-4 py-3 border border-[#76C7C0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#76C7C0] focus:border-transparent transition-all duration-300"
+                    aria-required="true"
                   />
-                  <FormMessage />
+                  <FormMessage className="text-sm text-red-600" />
                 </FormItem>
               )}
             />
+
             <FormField
               name="password"
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700 text-sm font-medium">Password</FormLabel>
+                  <FormLabel className="text-sm text-[#517D9B] font-medium">
+                    Password
+                  </FormLabel>
                   <div className="relative">
                     <Input
                       type={showPassword ? 'text' : 'password'}
                       {...field}
-                      className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
                       placeholder="••••••••"
+                      className="w-full px-4 py-3 pr-10 border border-[#76C7C0] rounded-xl focus:outline-none focus:ring-2 focus:ring-[#76C7C0] focus:border-transparent transition-all duration-300"
+                      aria-required="true"
                     />
-                    <div
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute inset-y-0 right-3 flex items-center text-[#517D9B] hover:text-[#2E86AB] transition-colors duration-300 focus:outline-none"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </div>
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
                   </div>
-                  <FormMessage />
+                  <FormMessage className="text-sm text-red-600" />
                 </FormItem>
               )}
             />
 
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-medium transition-transform transform hover:scale-105 focus:ring-2 focus:ring-offset-2 focus:ring-blue-400"
               disabled={isSubmitting}
+              className="w-full bg-[#2E86AB] hover:bg-[#256d8c] text-white py-3 rounded-xl font-semibold tracking-wide shadow-md transition-transform duration-300 hover:scale-105 focus:ring-4 focus:ring-offset-2 focus:ring-[#2E86AB]"
+              aria-live="polite"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Please wait
+                  <Loader2 className="inline mr-2 h-5 w-5 animate-spin" />
+                  Please wait...
                 </>
               ) : (
                 'Sign In'
@@ -135,15 +165,17 @@ export default function SignInForm() {
             </Button>
           </form>
         </Form>
-        <div className="text-center mt-6">
-          <p className="text-gray-600 text-sm">
-            Not a member yet?{' '}
-            <Link href="/signup" className="text-blue-600 hover:underline">
-              Sign up
-            </Link>
-          </p>
+
+        <div className="text-center text-sm text-[#517D9B] font-medium">
+          Not a member yet?{' '}
+          <Link
+            href="/signup"
+            className="text-[#76C7C0] hover:underline hover:text-[#2E86AB]"
+          >
+            Sign up
+          </Link>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

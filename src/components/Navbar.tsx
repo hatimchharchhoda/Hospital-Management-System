@@ -24,6 +24,15 @@ const navLinks = [
   { href: '/History', label: 'History', icon: <History size={18} /> },
 ]
 
+// Your primary & accent colors from requirements
+const colors = {
+  primary: '#2E86AB',     // calm blue
+  background: '#F5F9FF',  // soft white
+  textDark: '#1C1F26',    // dark text
+  accentAqua: '#76C7C0',  // aqua green
+  accentYellow: '#F4D35E' // mild yellow
+}
+
 const Navbar = () => {
   const pathname = usePathname()
   const { data: session, status } = useSession()
@@ -40,27 +49,37 @@ const Navbar = () => {
       initial={{ y: -25, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5 }}
-      className="fixed top-0 z-50 w-full bg-white/80 dark:bg-slate-900/90 backdrop-blur-md shadow-md px-6 py-3 flex items-center justify-between"
+      className="fixed top-0 z-50 w-full backdrop-blur-md shadow-md px-6 py-3 flex items-center justify-between"
+      style={{ backgroundColor: `${colors.background}cc` }} // Slight transparency
     >
       {/* Hospital Name / Logo */}
-      <div className="text-xl font-semibold text-primary">
+      <div
+        className="text-2xl font-semibold select-none"
+        style={{ color: colors.primary, fontFamily: "'Inter', sans-serif" }}
+      >
         {user?.hospitalName || 'Patient Manager'}
       </div>
 
       {/* Navigation Links */}
-      <div className="hidden md:flex gap-4 items-center">
+      <div className="hidden md:flex gap-6 items-center">
         {navLinks.map(({ href, label, icon }) => (
-          <Link key={href} href={href}>
-            <span
-              className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive(href)
-                  ? 'text-primary underline underline-offset-4'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-slate-800'
-              }`}
-            >
-              {icon}
-              {label}
-            </span>
+          <Link
+            key={href}
+            href={href}
+            className={`flex items-center gap-2 px-4 py-2 rounded-2xl text-base font-semibold transition-colors duration-300
+              ${isActive(href)
+                ? 'text-white bg-[#378aae] shadow-md'
+                : 'text-[#1C1F26] hover:text-[#76C7C0] hover:bg-[#F5F9FF]'
+              }
+            `}
+            style={{
+              borderRadius: '1rem',
+              userSelect: 'none',
+            }}
+            aria-current={isActive(href) ? 'page' : undefined}
+          >
+            {icon}
+            {label}
           </Link>
         ))}
       </div>
@@ -72,37 +91,60 @@ const Navbar = () => {
             <DropdownMenuTrigger asChild>
               <Button
                 variant="ghost"
-                className="rounded-full bg-primary text-white w-10 h-10 hover:scale-105 transition-transform"
+                className="rounded-full bg-[${colors.primary}] text-white w-10 h-10 hover:scale-105 hover:shadow-lg transition-transform duration-300"
+                style={{ backgroundColor: colors.primary }}
+                aria-label="User menu"
               >
                 {initials}
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="z-50 bg-white dark:bg-slate-800 shadow-lg rounded-md p-1">
-              <div className="px-3 py-1 text-sm text-muted-foreground">
+            <DropdownMenuContent
+              align="end"
+              className="z-50 bg-white shadow-lg rounded-2xl p-2"
+              style={{ borderColor: colors.accentAqua }}
+            >
+              <div
+                className="px-4 py-2 text-sm font-medium"
+                style={{ color: colors.textDark }}
+              >
                 Hello, {user?.username}
               </div>
               <DropdownMenuItem asChild>
-                <Link href="/profile" className="flex items-center gap-2">
-                  <UserCircle2 size={16} /> Profile
+                <Link
+                  href="/profile"
+                  className="flex items-center gap-2 text-base text-[${colors.textDark}] hover:bg-[${colors.accentAqua}] hover:text-white rounded-lg px-2 py-1 transition-colors"
+                  style={{ borderRadius: '0.5rem' }}
+                >
+                  <UserCircle2 size={16} />
+                  Profile
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => signOut()}
-                className="flex items-center gap-2 text-red-600 hover:bg-red-50 dark:hover:bg-slate-700"
+                className="flex items-center gap-2 text-yellow-600 hover:bg-yellow-100 rounded-lg px-2 py-1 transition-colors"
+                style={{ borderRadius: '0.5rem' }}
               >
-                <LogOut size={16} /> Logout
+                <LogOut size={16} />
+                Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
           <>
             <Link href="/signin">
-              <Button variant="ghost" className="text-sm">
+              <Button
+                variant="outline"
+                className="text-base text-[${colors.primary}] hover:bg-[${colors.accentAqua}] hover:text-white transition-colors duration-300"
+              >
                 Sign In
               </Button>
             </Link>
             <Link href="/signup">
-              <Button className="text-sm">Sign Up</Button>
+              <Button
+                className="text-base bg-[${colors.accentAqua}] hover:bg-[${colors.primary}] text-white transition-colors duration-300"
+              >
+                Sign Up
+              </Button>
             </Link>
           </>
         )}

@@ -1,5 +1,13 @@
+'use client';
+
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import axios from 'axios';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { toast } from '@/hooks/use-toast';
 
 interface Room {
   roomNo: string;
@@ -38,7 +46,7 @@ export interface PatientFormData {
 
 interface Props {
   patientId: string;
-  record: Partial<PatientFormData>; // Only treatment fields are used
+  record: Partial<PatientFormData>;
   onClose: () => void;
   onSuccess: () => void;
 }
@@ -74,13 +82,22 @@ export default function DateTreatmentPopup({ patientId, record, onClose }: Props
 
   const updateRecord = async () => {
     try {
-      await axios.put('/api/update-patient-records', {
+      const res = await axios.put('/api/update-patient-records', {
         patientId,
         date: record.date,
         updatedTreatmentRecord: form,
       });
+      toast({
+        title: "Success",
+        description: res.data.message || "Successfully updated records",
+      });
       onClose();
     } catch (err) {
+      toast({
+        title: "Error",
+        description: "Error while updating records",
+        variant: "destructive",
+      });
       console.error('Update error:', err);
     }
   };
@@ -99,201 +116,174 @@ export default function DateTreatmentPopup({ patientId, record, onClose }: Props
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <h3 className="text-lg font-bold mb-4">
-          Edit Treatment for {new Date(record.date ?? '').toLocaleDateString()}
-        </h3>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0 }}
+        className="w-full max-w-3xl rounded-2xl bg-white p-6 shadow-xl max-h-[90vh]"
+      >
+        <ScrollArea className="h-[75vh] pr-2">
+          <h3 className="text-2xl font-semibold text-[#2E86AB] mb-6">
+            Edit Treatment – {new Date(record.date ?? '').toLocaleDateString()}
+          </h3>
 
-        {/* Doctor Fees */}
-        <div className="mb-3">
-          <label className="block text-sm font-medium">Doctor Fees</label>
-          <input
-            type="text"
-            value={form.doctorFees}
-            onChange={(e) => setForm({ ...form, doctorFees: e.target.value })}
-            className="w-full border px-3 py-1 rounded"
-          />
-        </div>
-
-        {/* Room Details */}
-        <div className="mb-3 grid grid-cols-2 gap-2">
-          <div>
-            <label className="text-sm block font-medium">Room No</label>
-            <input
-              type="text"
-              value={form.room?.roomNo}
-              onChange={(e) =>
-                setForm({ ...form, room: { ...form.room!, roomNo: e.target.value } })
-              }
-              className="w-full border px-3 py-1 rounded"
-            />
-          </div>
-          <div>
-            <label className="text-sm block font-medium">Bed No</label>
-            <input
-              type="text"
-              value={form.room?.bedNo}
-              onChange={(e) =>
-                setForm({ ...form, room: { ...form.room!, bedNo: e.target.value } })
-              }
-              className="w-full border px-3 py-1 rounded"
-            />
-          </div>
-          <div>
-            <label className="text-sm block font-medium">Room Category</label>
-            <select
-              value={form.room?.roomCategory}
-              onChange={(e) =>
-                setForm({ ...form, room: { ...form.room!, roomCategory: e.target.value } })
-              }
-              className="w-full border px-3 py-1 rounded"
-            >
-              <option defaultValue="null">Select Category</option>
-              <option value="general">General</option>
-              <option value="semi-private">Semi-private</option>
-              <option value="private">Private</option>
-              <option value="ICU">ICU</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-sm block font-medium">Room Price</label>
-            <input
-              type="text"
-              value={form.room?.roomPrice}
-              onChange={(e) =>
-                setForm({ ...form, room: { ...form.room!, roomPrice: e.target.value } })
-              }
-              className="w-full border px-3 py-1 rounded"
-            />
-          </div>
-        </div>
-
-        {/* Bottles & Injections */}
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <div>
-            <label className="text-sm font-medium block">Bottles</label>
-            <input
-              type="text"
-              value={form.bottles?.count}
-              onChange={(e) =>
-                setForm({ ...form, bottles: { ...form.bottles!, count: e.target.value } })
-              }
-              className="w-full border px-3 py-1 rounded mb-1"
-              placeholder="Count"
-            />
-            <input
-              type="text"
-              value={form.bottles?.price}
-              onChange={(e) =>
-                setForm({ ...form, bottles: { ...form.bottles!, price: e.target.value } })
-              }
-              className="w-full border px-3 py-1 rounded"
-              placeholder="Price"
-            />
-          </div>
-
-          <div>
-            <label className="text-sm font-medium block">Injections</label>
-            <input
-              type="text"
-              value={form.injections?.count}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  injections: { ...form.injections!, count: e.target.value },
-                })
-              }
-              className="w-full border px-3 py-1 rounded mb-1"
-              placeholder="Count"
-            />
-            <input
-              type="text"
-              value={form.injections?.price}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  injections: { ...form.injections!, price: e.target.value },
-                })
-              }
-              className="w-full border px-3 py-1 rounded"
-              placeholder="Price"
-            />
-          </div>
-        </div>
-
-        {/* Operation & Other Cost */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          <div>
-            <label className="block text-sm font-medium">Operation Cost</label>
-            <input
-              type="text"
-              value={form.operationCost}
-              onChange={(e) =>
-                setForm({ ...form, operationCost: e.target.value })
-              }
-              className="w-full border px-3 py-1 rounded"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium">Other Cost</label>
-            <input
-              type="text"
-              value={form.otherCost}
-              onChange={(e) =>
-                setForm({ ...form, otherCost: e.target.value })
-              }
-              className="w-full border px-3 py-1 rounded"
-            />
-          </div>
-        </div>
-
-        {/* Medicines */}
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Medicines</label>
-          {form.medicines?.map((med, index) => (
-            <div key={index} className="grid grid-cols-3 gap-2 mb-2">
-              <input
-                type="text"
-                placeholder="Name"
-                value={med.name}
-                onChange={(e) => updateMedicine(index, 'name', e.target.value)}
-                className="border px-3 py-1 rounded"
-              />
-              <input
-                type="text"
-                placeholder="Quantity"
-                value={med.quantity}
-                onChange={(e) => updateMedicine(index, 'quantity', e.target.value)}
-                className="border px-3 py-1 rounded"
-              />
-              <input
-                type="text"
-                placeholder="Price"
-                value={med.price}
-                onChange={(e) => updateMedicine(index, 'price', e.target.value)}
-                className="border px-3 py-1 rounded"
+          <div className="space-y-4 text-base">
+            {/* Doctor Fees */}
+            <div>
+              <Label>Doctor Fees</Label>
+              <Input
+                value={form.doctorFees}
+                onChange={(e) => setForm({ ...form, doctorFees: e.target.value })}
               />
             </div>
-          ))}
-          <button type="button" className="mt-3 bg-blue-500 text-white px-3 py-1 rounded" onClick={addMedicine}>
-            Add Medicine
-          </button>
-        </div>
+
+            {/* Room Details */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Room No</Label>
+                <Input
+                  value={form.room?.roomNo}
+                  onChange={(e) =>
+                    setForm({ ...form, room: { ...form.room!, roomNo: e.target.value } })
+                  }
+                />
+              </div>
+              <div>
+                <Label>Bed No</Label>
+                <Input
+                  value={form.room?.bedNo}
+                  onChange={(e) =>
+                    setForm({ ...form, room: { ...form.room!, bedNo: e.target.value } })
+                  }
+                />
+              </div>
+              <div>
+                <Label>Room Category</Label>
+                <select
+                  value={form.room?.roomCategory}
+                  onChange={(e) =>
+                    setForm({ ...form, room: { ...form.room!, roomCategory: e.target.value } })
+                  }
+                  className="w-full border px-3 py-2 rounded-md"
+                >
+                  <option defaultValue="null">Select Category</option>
+                  <option value="general">General</option>
+                  <option value="semi-private">Semi-private</option>
+                  <option value="private">Private</option>
+                  <option value="ICU">ICU</option>
+                </select>
+              </div>
+              <div>
+                <Label>Room Price</Label>
+                <Input
+                  value={form.room?.roomPrice}
+                  onChange={(e) =>
+                    setForm({ ...form, room: { ...form.room!, roomPrice: e.target.value } })
+                  }
+                />
+              </div>
+            </div>
+
+            {/* Bottles & Injections */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Bottles (Count & Price)</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    placeholder="Count"
+                    value={form.bottles?.count}
+                    onChange={(e) =>
+                      setForm({ ...form, bottles: { ...form.bottles!, count: e.target.value } })
+                    }
+                  />
+                  <Input
+                    placeholder="Price"
+                    value={form.bottles?.price}
+                    onChange={(e) =>
+                      setForm({ ...form, bottles: { ...form.bottles!, price: e.target.value } })
+                    }
+                  />
+                </div>
+              </div>
+              <div>
+                <Label>Injections (Count & Price)</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  <Input
+                    placeholder="Count"
+                    value={form.injections?.count}
+                    onChange={(e) =>
+                      setForm({ ...form, injections: { ...form.injections!, count: e.target.value } })
+                    }
+                  />
+                  <Input
+                    placeholder="Price"
+                    value={form.injections?.price}
+                    onChange={(e) =>
+                      setForm({ ...form, injections: { ...form.injections!, price: e.target.value } })
+                    }
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Operation & Other Cost */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label>Operation Cost</Label>
+                <Input
+                  value={form.operationCost}
+                  onChange={(e) => setForm({ ...form, operationCost: e.target.value })}
+                />
+              </div>
+              <div>
+                <Label>Other Cost</Label>
+                <Input
+                  value={form.otherCost}
+                  onChange={(e) => setForm({ ...form, otherCost: e.target.value })}
+                />
+              </div>
+            </div>
+
+            {/* Medicines */}
+            <div>
+              <Label>Medicines</Label>
+              {form.medicines?.map((med, index) => (
+                <div key={index} className="grid grid-cols-3 gap-2 mb-2">
+                  <Input
+                    placeholder="Name"
+                    value={med.name}
+                    onChange={(e) => updateMedicine(index, 'name', e.target.value)}
+                  />
+                  <Input
+                    placeholder="Quantity"
+                    value={med.quantity}
+                    onChange={(e) => updateMedicine(index, 'quantity', e.target.value)}
+                  />
+                  <Input
+                    placeholder="Price"
+                    value={med.price}
+                    onChange={(e) => updateMedicine(index, 'price', e.target.value)}
+                  />
+                </div>
+              ))}
+              <Button variant="secondary" onClick={addMedicine} className="mt-2">
+                + Add Medicine
+              </Button>
+            </div>
+          </div>
+        </ScrollArea>
 
         {/* Action Buttons */}
-        <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onClose} className="px-4 py-1 border rounded">
+        <div className="flex justify-end gap-3 mt-6">
+          <Button variant="outline" onClick={onClose}>
             Cancel
-          </button>
-          <button
-            onClick={updateRecord}
-            className="px-4 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-          >
+          </Button>
+          <Button onClick={updateRecord} className="bg-[#76C7C0] hover:bg-[#5CB8AE] text-white">
             Update
-          </button>
+          </Button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

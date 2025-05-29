@@ -1,8 +1,20 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { TreatmentRecord } from '@/types/patients';
+"use client";
 
-// Props
+import { useState } from "react";
+import axios from "axios";
+import { TreatmentRecord } from "@/types/patients";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "@/hooks/use-toast";
+
 interface Props {
   patientId: string;
   onClose: () => void;
@@ -10,13 +22,15 @@ interface Props {
 }
 
 export default function NewTreatmentPopup({ patientId, onClose, onSuccess }: Props) {
+  const [open, setOpen] = useState(true);
+
   const [form, setForm] = useState<TreatmentRecord>({
-    treatmentFor: '',
-    date: '',
+    treatmentFor: "",
+    date: "",
     room: {
-      roomNo: '',
-      bedNo: '',
-      roomCategory: 'null',
+      roomNo: "",
+      bedNo: "",
+      roomCategory: "null",
       roomPrice: 0,
     },
     bottles: { count: 0, price: 0 },
@@ -27,123 +41,149 @@ export default function NewTreatmentPopup({ patientId, onClose, onSuccess }: Pro
     medicines: [],
   });
 
-
   const handleChange = (
-      e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-      section?: string,
-      field?: string,
-      index?: number
-    ) => {
-      const { name, value } = e.target;
-  
-      if (section === 'medicines' && typeof index === 'number') {
-        const updatedMedicines = [...form.medicines];
-        updatedMedicines[index] = { ...updatedMedicines[index], [name]: value };
-        setForm({ ...form, medicines: updatedMedicines });
-      } else if (section) {
-        setForm({
-          ...form,
-          [section]: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            ...(form as any)[section],
-            [name]: value,
-          },
-        });
-      } else {
-        setForm({ ...form, [name]: value });
-      }
-    };
-//   const addMedicine = () => {
-//     if (!newMed.name || !newMed.quantity || !newMed.price) return;
-//     setForm({
-//       ...form,
-//       medicines: [
-//         ...form.medicines,
-//         {
-//           name: newMed.name,
-//           quantity: newMed.quantity,
-//           price: newMed.price,
-//         },
-//       ],
-//     });
-//     setNewMed({ name: '', quantity: '', price: '' });
-//   };
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    section?: string,
+    index?: number
+  ) => {
+    const { name, value } = e.target;
 
-  const saveRecord = async () => {
-    try {
-      await axios.post('/api/add-new-day-patientsRecord', {
-        patientId,
-        treatmentRecord: form,
+    if (section === "medicines" && typeof index === "number") {
+      const updatedMedicines = [...form.medicines];
+      updatedMedicines[index] = { ...updatedMedicines[index], [name]: value };
+      setForm({ ...form, medicines: updatedMedicines });
+    } else if (section) {
+      setForm({
+        ...form,
+        [section]: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ...(form as any)[section],
+          [name]: name === "count" || name === "price" ? Number(value) : value,
+        },
       });
-      onSuccess?.();
-      onClose();
-    } catch (err) {
-      console.error('Error saving record:', err);
+    } else {
+      setForm({
+        ...form,
+        [name]:
+          name === "doctorFees" ||
+          name === "operationCost" ||
+          name === "otherCost"
+            ? Number(value)
+            : value,
+      });
     }
   };
 
   const addMedicine = () => {
     setForm({
       ...form,
-      medicines: [...(form.medicines ?? []), { name: '', quantity: '', price: '' }],
+      medicines: [...(form.medicines ?? []), { name: "", quantity: "", price: "" }],
     });
   };
 
+  const saveRecord = async () => {
+    try {
+      const res = await axios.post("/api/add-new-day-patientsRecord", {
+        patientId,
+        treatmentRecord: form,
+      });
+      toast({
+        title: "Success",
+        description: res.data.message || "Successfully added new day patient record",
+      });
+      onSuccess?.();
+      setOpen(false);
+      onClose();
+    } catch (err) {
+      toast({
+        title: "Error",
+        description:"Error adding new day patient record",
+        variant: "destructive",
+      });
+      console.error("Error saving record:", err);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg overflow-y-auto max-h-[90vh]">
-        <h3 className="text-lg font-bold mb-4">Add New Treatment Record</h3>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      setOpen(isOpen);
+      if (!isOpen) onClose();
+    }}>
+      {/* You can add a trigger if you want, else skip DialogTrigger */}
+      <DialogContent className="bg-[#F5F9FF] p-6 rounded-2xl shadow-lg w-full max-w-lg max-h-[90vh] overflow-y-auto text-[#1C1F26]">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-semibold mb-4">
+            Add New Treatment Record
+          </DialogTitle>
+        </DialogHeader>
 
         {/* Treatment For */}
-        <div className="mb-3">
-          <label className="block text-sm font-medium">Treatment For</label>
-          <input
+        <div className="mb-4">
+          <Label htmlFor="treatmentFor" className="text-sm text-muted-foreground">
+            Treatment For
+          </Label>
+          <Input
+            id="treatmentFor"
             type="text"
-            className="w-full border px-3 py-1 rounded"
             value={form.treatmentFor}
             onChange={(e) => setForm({ ...form, treatmentFor: e.target.value })}
+            className="mt-1"
           />
         </div>
 
         {/* Doctor Fees */}
-        <div className="mb-3">
-          <label className="block text-sm font-medium">Doctor Fees</label>
-          <input
+        <div className="mb-4">
+          <Label htmlFor="doctorFees" className="text-sm text-muted-foreground">
+            Doctor Fees
+          </Label>
+          <Input
+            id="doctorFees"
             type="number"
-            className="w-full border px-3 py-1 rounded"
-            value={form.doctorFees}
             onChange={(e) => setForm({ ...form, doctorFees: Number(e.target.value) })}
+            className="mt-1"
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium">New Day Treatment</label>
-          <input type="date" name="date" className="w-full border px-3 py-1 rounded" value={form.date} onChange={handleChange} />
+        {/* Date */}
+        <div className="mb-4">
+          <Label htmlFor="date" className="text-sm text-muted-foreground">
+            New Day Treatment Date
+          </Label>
+          <Input
+            id="date"
+            type="date"
+            name="date"
+            value={form.date}
+            onChange={handleChange}
+            className="mt-1"
+          />
         </div>
 
         {/* Room */}
-        <div className="grid grid-cols-2 gap-2 mb-3 py-2">
-          <input
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <Input
             placeholder="Room No"
-            className="border px-3 py-1 rounded"
-            value={form.room?.roomNo || ''}
+            value={form.room?.roomNo || ""}
             onChange={(e) =>
               setForm({ ...form, room: { ...form.room!, roomNo: e.target.value } })
             }
           />
-          <input
+          <Input
             placeholder="Bed No"
-            className="border px-3 py-1 rounded"
-            value={form.room?.bedNo || ''}
+            value={form.room?.bedNo || ""}
             onChange={(e) =>
               setForm({ ...form, room: { ...form.room!, bedNo: e.target.value } })
             }
           />
           <select
-            className="col-span-2 border px-3 py-1 rounded"
+            className="col-span-2 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2E86AB] focus:ring-opacity-50"
             value={form.room?.roomCategory}
             onChange={(e) =>
-              setForm({ ...form, room: { ...form.room!, roomCategory: e.target.value as 'general' | 'semi-private' | 'private' | 'ICU' | 'null' } })
+              setForm({
+                ...form,
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                room: { ...form.room!, roomCategory: e.target.value as any },
+              })
             }
           >
             <option value="null">Select Room Category</option>
@@ -155,86 +195,101 @@ export default function NewTreatmentPopup({ patientId, onClose, onSuccess }: Pro
         </div>
 
         {/* Bottles & Injections */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          <input
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <Input
             placeholder="Bottle Count"
             type="number"
-            className="border px-3 py-1 rounded"
-            value={form.bottles?.count || ''}
-            onChange={(e) => setForm({ ...form, bottles: { ...form.bottles!, count: Number(e.target.value) } })}
+            value={form.bottles?.count || ""}
+            onChange={(e) =>
+              setForm({ ...form, bottles: { ...form.bottles!, count: Number(e.target.value) } })
+            }
           />
-          <input
+          <Input
             placeholder="Bottle Price"
             type="number"
-            className="border px-3 py-1 rounded"
-            value={form.bottles?.price || ''}
-            onChange={(e) => setForm({ ...form, bottles: { ...form.bottles!, price: Number(e.target.value) } })}
+            value={form.bottles?.price || ""}
+            onChange={(e) =>
+              setForm({ ...form, bottles: { ...form.bottles!, price: Number(e.target.value) } })
+            }
           />
-          <input
+          <Input
             placeholder="Injection Count"
             type="number"
-            className="border px-3 py-1 rounded"
-            value={form.injections?.count || ''}
-            onChange={(e) => setForm({ ...form, injections: { ...form.injections!, count: Number(e.target.value) } })}
+            value={form.injections?.count || ""}
+            onChange={(e) =>
+              setForm({ ...form, injections: { ...form.injections!, count: Number(e.target.value) } })
+            }
           />
-          <input
+          <Input
             placeholder="Injection Price"
             type="number"
-            className="border px-3 py-1 rounded"
-            value={form.injections?.price || ''}
-            onChange={(e) => setForm({ ...form, injections: { ...form.injections!, price: Number(e.target.value) } })}
+            value={form.injections?.price || ""}
+            onChange={(e) =>
+              setForm({ ...form, injections: { ...form.injections!, price: Number(e.target.value) } })
+            }
           />
         </div>
 
         {/* Other Costs */}
-        <div className="grid grid-cols-2 gap-2 mb-3">
-          <input
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Input
             placeholder="Operation Cost"
             type="number"
-            className="border px-3 py-1 rounded"
-            value={form.operationCost || ''}
+            value={form.operationCost || ""}
             onChange={(e) => setForm({ ...form, operationCost: Number(e.target.value) })}
           />
-          <input
+          <Input
             placeholder="Other Cost"
             type="number"
-            className="border px-3 py-1 rounded"
-            value={form.otherCost || ''}
+            value={form.otherCost || ""}
             onChange={(e) => setForm({ ...form, otherCost: Number(e.target.value) })}
           />
         </div>
 
         {/* Medicines List */}
-        <div className="mb-3">
-          <label className="block text-sm font-medium mb-1">Medicines</label>
+        <div className="mb-6">
+          <Label className="text-sm text-muted-foreground mb-2 block">Medicines</Label>
           {form.medicines.map((med, idx) => (
-          <div key={idx} className="grid gap-2 md:grid-cols-3 mt-2">
-            <input type="text" name="name" placeholder="Medicine Name" className="input" value={med.name} onChange={(e) => handleChange(e, 'medicines', 'name', idx)} />
-            <input type="number" name="quantity" placeholder="Quantity" className="input" value={med.quantity} onChange={(e) => handleChange(e, 'medicines', 'quantity', idx)} />
-            <input type="number" name="price" placeholder="Price" className="input" value={med.price} onChange={(e) => handleChange(e, 'medicines', 'price', idx)} />
-          </div>
-        ))}
-            <button
-              onClick={addMedicine}
-              className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
-            >
-              Add
-            </button>
-          </div>
+            <div key={idx} className="grid gap-2 md:grid-cols-3 mb-3">
+              <Input
+                type="text"
+                name="name"
+                placeholder="Medicine Name"
+                value={med.name}
+                onChange={(e) => handleChange(e, "medicines", idx)}
+              />
+              <Input
+                type="number"
+                name="quantity"
+                placeholder="Quantity"
+                value={med.quantity}
+                onChange={(e) => handleChange(e, "medicines", idx)}
+              />
+              <Input
+                type="number"
+                name="price"
+                placeholder="Price"
+                value={med.price}
+                onChange={(e) => handleChange(e, "medicines", idx)}
+              />
+            </div>
+          ))}
+
+          <Button variant="outline" size="sm" onClick={addMedicine}>
+            Add Medicine
+          </Button>
+        </div>
 
         {/* Actions */}
-        <div className="flex justify-end gap-2 mt-4">
-          <button onClick={onClose} className="px-4 py-1 border rounded">
+        <DialogFooter className="flex justify-end gap-4">
+          <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
-          </button>
-          <button
-            onClick={saveRecord}
-            className="px-4 py-1 bg-green-500 text-white rounded hover:bg-green-600"
-          >
+          </Button>
+          <Button onClick={saveRecord} className="bg-[#76C7C0] hover:bg-[#5bb0ab]" type="button">
             Save
-          </button>
-        </div>
-      </div>
-      </div>
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

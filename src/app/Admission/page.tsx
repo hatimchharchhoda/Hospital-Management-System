@@ -1,7 +1,20 @@
 "use client";
+
 import { PatientFormData } from "@/types/treatment";
 import React, { useState } from "react";
 import { useSearchParams } from 'next/navigation';
+import { motion } from "framer-motion";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { toast } from "@/hooks/use-toast";
 
 const PatientAdmissionForm = () => {
   const searchParams = useSearchParams();
@@ -101,277 +114,370 @@ const PatientAdmissionForm = () => {
 
       const data = await res.json();
       if (res.ok) {
-        alert("Patient submitted successfully");
-        // Optionally reset form
-        // setFormData(...initial);
+        toast({
+          title: "Success",
+          description: data.message ||"Patient admitted successfully",
+        });
       } else {
-        alert(data.message || "Error submitting patient");
+        toast({
+          title: "Error",
+          description: data.message ||"Error admitting patient",
+        });
       }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
-      alert("Something went wrong.");
+      toast({
+          title: "Error",
+          description: "Unexpected error occurred",
+          variant: "destructive",
+        });
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="p-4">
-      <h2 className="text-xl font-semibold mb-4">Patient Admission Form</h2>
-      <div className="mb-4">
-        <label className="inline-flex items-center">
-          <input
-            type="checkbox"
-            checked={isOldPatient}
-            onChange={() => setIsOldPatient(!isOldPatient)}
-            className="mr-2"
-          />
-          Old Patient
-        </label>
-      </div>
-
-      {isOldPatient && (
-        <div>
-          <label className="block mb-1">Patient ID</label>
-          <input
-            type="text"
-            name="patientId"
-            className="input"
-            value={formData.patientId}
-            onChange={handleChange}
-          />
-        </div>
-      )}
-      <div className="grid gap-4 md:grid-cols-2">
-        <div>
-          <label className="block mb-1">Patient Name</label>
-          <input
-            type="text"
-            name="name"
-            className="input"
-            value={formData.name}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label className="block mb-1">Mobile</label>
-          <input
-            type="text"
-            name="mobile"
-            className="input"
-            value={formData.mobile}
-            onChange={handleChange}
-          />
-        </div>
-        <div className="md:col-span-2">
-          <label className="block mb-1">Address</label>
-          <input
-            type="text"
-            name="address"
-            className="input w-full"
-            value={formData.address}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Treatment For</label>
-          <input
-            type="text"
-            name="treatment_for"
-            className="input"
-            value={formData.treatmentFor}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Date of Treatment</label>
-          <input
-            type="date"
-            name="date"
-            className="input"
-            value={formData.date}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Room Number</label>
-          <input
-            type="text"
-            name="roomNo"
-            className="input"
-            value={formData.room.roomNo}
-            onChange={(e) => handleChange(e, "room")}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Bed Number</label>
-          <input
-            type="text"
-            name="bedNo"
-            className="input"
-            value={formData.room.bedNo}
-            onChange={(e) => handleChange(e, "room")}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Room Category</label>
-          <select
-            name="roomCategory"
-            className="input"
-            value={formData.room.roomCategory}
-            onChange={(e) => handleChange(e, "room")}
-          >
-            <option value="">--Select--</option>
-            <option value="general">General</option>
-            <option value="semi-private">Semi-Private</option>
-            <option value="private">Private</option>
-            <option value="ICU">ICU</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block mb-1">Room Price</label>
-          <input
-            type="number"
-            name="roomPrice"
-            className="input"
-            value={formData.room.roomPrice}
-            onChange={(e) => handleChange(e, "room")}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Bottle Count</label>
-          <input
-            type="number"
-            name="count"
-            className="input"
-            value={formData.bottles.count}
-            onChange={(e) => handleChange(e, "bottles")}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Bottle Price</label>
-          <input
-            type="number"
-            name="price"
-            className="input"
-            value={formData.bottles.price}
-            onChange={(e) => handleChange(e, "bottles")}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Injection Count</label>
-          <input
-            type="number"
-            name="count"
-            className="input"
-            value={formData.injections.count}
-            onChange={(e) => handleChange(e, "injections")}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Injection Price</label>
-          <input
-            type="number"
-            name="price"
-            className="input"
-            value={formData.injections.price}
-            onChange={(e) => handleChange(e, "injections")}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Doctor Fees</label>
-          <input
-            type="number"
-            name="doctorFees"
-            className="input"
-            value={formData.doctorFees}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Operation Cost</label>
-          <input
-            type="number"
-            name="operationCost"
-            className="input"
-            value={formData.operationCost}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <label className="block mb-1">Other Cost</label>
-          <input
-            type="number"
-            name="otherCost"
-            className="input"
-            value={formData.otherCost}
-            onChange={handleChange}
-          />
-        </div>
-      </div>
-
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2">Medicines</h3>
-        {formData.medicines.map((med, idx) => (
-          <div key={idx} className="grid gap-2 md:grid-cols-3 mt-2">
-            <input
-              type="text"
-              name="name"
-              placeholder="Medicine Name"
-              className="input"
-              value={med.name}
-              onChange={(e) => handleChange(e, "medicines", "name", idx)}
-            />
-            <input
-              type="number"
-              name="quantity"
-              placeholder="Quantity"
-              className="input"
-              value={med.quantity}
-              onChange={(e) => handleChange(e, "medicines", "quantity", idx)}
-            />
-            <input
-              type="number"
-              name="price"
-              placeholder="Price"
-              className="input"
-              value={med.price}
-              onChange={(e) => handleChange(e, "medicines", "price", idx)}
-            />
+ return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="min-h-screen bg-gradient-to-br from-[#e3f0ff] via-[#d2e8ff] to-[#ffffff] 
+                 flex items-center justify-center px-6 py-12"
+    >
+      <Card className="w-full max-w-4xl rounded-2xl border border-[#2E86AB] bg-white shadow-xl drop-shadow-lg">
+        <CardHeader>
+          <CardTitle className="text-2xl font-semibold text-[#2E86AB]">
+            Patient Admission Form
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="mb-6">
+            <label className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={isOldPatient}
+                onChange={() => setIsOldPatient(!isOldPatient)}
+                className="rounded border-gray-300 text-[#76C7C0] focus:ring-[#2E86AB]"
+              />
+              Old Patient
+            </label>
           </div>
-        ))}
-        <button
-          type="button"
-          className="mt-3 bg-blue-500 text-white px-3 py-1 rounded"
-          onClick={addMedicine}
-        >
-          Add Medicine
-        </button>
-      </div>
 
-      <div className="mt-6">
-        <button
-          onClick={handleSubmit}
-          disabled={isSubmitting}
-          className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded"
-        >
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </button>
-      </div>
-    </div>
+          {isOldPatient && (
+            <div className="mb-4">
+              <Label htmlFor="patientId" className="text-sm text-[#1C1F26]">
+                Patient ID
+              </Label>
+              <Input
+                id="patientId"
+                name="patientId"
+                value={formData.patientId}
+                onChange={handleChange}
+                className="mt-1"
+                placeholder="Enter patient ID"
+              />
+            </div>
+          )}
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <div>
+              <Label htmlFor="name" className="text-sm text-[#1C1F26]">
+                Patient Name
+              </Label>
+              <Input
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="mt-1"
+                placeholder="Enter patient name"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="mobile" className="text-sm text-[#1C1F26]">
+                Mobile
+              </Label>
+              <Input
+                id="mobile"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+                className="mt-1"
+                placeholder="Enter mobile number"
+              />
+            </div>
+
+            <div className="md:col-span-2">
+              <Label htmlFor="address" className="text-sm text-[#1C1F26]">
+                Address
+              </Label>
+              <Input
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="mt-1 w-full"
+                placeholder="Enter address"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="treatment_for" className="text-sm text-[#1C1F26]">
+                Treatment For
+              </Label>
+              <Input
+                id="treatment_for"
+                name="treatmentFor"
+                value={formData.treatmentFor}
+                onChange={handleChange}
+                className="mt-1"
+                placeholder="Treatment purpose"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="date" className="text-sm text-[#1C1F26]">
+                Date of Treatment
+              </Label>
+              <Input
+                id="date"
+                name="date"
+                type="date"
+                value={formData.date}
+                onChange={handleChange}
+                className="mt-1"
+              />
+            </div>
+
+            {/* Room info inputs */}
+            <div>
+              <Label htmlFor="roomNo" className="text-sm text-[#1C1F26]">
+                Room Number
+              </Label>
+              <Input
+                id="roomNo"
+                name="roomNo"
+                value={formData.room.roomNo}
+                onChange={(e) => handleChange(e, "room")}
+                className="mt-1"
+                placeholder="Room number"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="bedNo" className="text-sm text-[#1C1F26]">
+                Bed Number
+              </Label>
+              <Input
+                id="bedNo"
+                name="bedNo"
+                value={formData.room.bedNo}
+                onChange={(e) => handleChange(e, "room")}
+                className="mt-1"
+                placeholder="Bed number"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="roomCategory" className="text-sm text-[#1C1F26]">
+                Room Category
+              </Label>
+              <select
+                id="roomCategory"
+                name="roomCategory"
+                className="input mt-1 rounded-md border border-gray-300 bg-white px-3 py-2 text-base text-[#1C1F26] focus:outline-none focus:ring-2 focus:ring-[#2E86AB]"
+                value={formData.room.roomCategory}
+                onChange={(e) => handleChange(e, "room")}
+              >
+                <option value="">--Select--</option>
+                <option value="general">General</option>
+                <option value="semi-private">Semi-Private</option>
+                <option value="private">Private</option>
+                <option value="ICU">ICU</option>
+              </select>
+            </div>
+
+            <div>
+              <Label htmlFor="roomPrice" className="text-sm text-[#1C1F26]">
+                Room Price
+              </Label>
+              <Input
+                id="roomPrice"
+                name="roomPrice"
+                type="number"
+                value={formData.room.roomPrice}
+                onChange={(e) => handleChange(e, "room")}
+                className="mt-1"
+                placeholder="Room price"
+              />
+            </div>
+
+            {/* Bottles */}
+            <div>
+              <Label htmlFor="bottleCount" className="text-sm text-[#1C1F26]">
+                Bottle Count
+              </Label>
+              <Input
+                id="bottleCount"
+                name="count"
+                type="number"
+                value={formData.bottles.count}
+                onChange={(e) => handleChange(e, "bottles")}
+                className="mt-1"
+                placeholder="Bottle count"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="bottlePrice" className="text-sm text-[#1C1F26]">
+                Bottle Price
+              </Label>
+              <Input
+                id="bottlePrice"
+                name="price"
+                type="number"
+                value={formData.bottles.price}
+                onChange={(e) => handleChange(e, "bottles")}
+                className="mt-1"
+                placeholder="Bottle price"
+              />
+            </div>
+
+            {/* Injections */}
+            <div>
+              <Label htmlFor="injectionCount" className="text-sm text-[#1C1F26]">
+                Injection Count
+              </Label>
+              <Input
+                id="injectionCount"
+                name="count"
+                type="number"
+                value={formData.injections.count}
+                onChange={(e) => handleChange(e, "injections")}
+                className="mt-1"
+                placeholder="Injection count"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="injectionPrice" className="text-sm text-[#1C1F26]">
+                Injection Price
+              </Label>
+              <Input
+                id="injectionPrice"
+                name="price"
+                type="number"
+                value={formData.injections.price}
+                onChange={(e) => handleChange(e, "injections")}
+                className="mt-1"
+                placeholder="Injection price"
+              />
+            </div>
+
+            {/* Fees & Costs */}
+            <div>
+              <Label htmlFor="doctorFees" className="text-sm text-[#1C1F26]">
+                Doctor Fees
+              </Label>
+              <Input
+                id="doctorFees"
+                name="doctorFees"
+                type="number"
+                value={formData.doctorFees}
+                onChange={handleChange}
+                className="mt-1"
+                placeholder="Doctor fees"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="operationCost" className="text-sm text-[#1C1F26]">
+                Operation Cost
+              </Label>
+              <Input
+                id="operationCost"
+                name="operationCost"
+                type="number"
+                value={formData.operationCost}
+                onChange={handleChange}
+                className="mt-1"
+                placeholder="Operation cost"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="otherCost" className="text-sm text-[#1C1F26]">
+                Other Cost
+              </Label>
+              <Input
+                id="otherCost"
+                name="otherCost"
+                type="number"
+                value={formData.otherCost}
+                onChange={handleChange}
+                className="mt-1"
+                placeholder="Other cost"
+              />
+            </div>
+          </div>
+
+          {/* Medicines */}
+          <div className="mt-8">
+            <h3 className="text-xl font-semibold text-[#1C1F26] mb-3">Medicines</h3>
+            <ScrollArea className="max-h-48 rounded-lg border border-gray-200 p-3 bg-white">
+              {formData.medicines.map((med, idx) => (
+                <div key={idx} className="grid gap-4 md:grid-cols-3 mb-4">
+                  <Input
+                    type="text"
+                    name="name"
+                    placeholder="Medicine Name"
+                    value={med.name}
+                    onChange={(e) => handleChange(e, "medicines", "name", idx)}
+                    className="rounded-md border border-gray-300 px-3 py-2 text-base text-[#1C1F26]"
+                  />
+                  <Input
+                    type="number"
+                    name="quantity"
+                    placeholder="Quantity"
+                    value={med.quantity}
+                    onChange={(e) => handleChange(e, "medicines", "quantity", idx)}
+                    className="rounded-md border border-gray-300 px-3 py-2 text-base text-[#1C1F26]"
+                  />
+                  <Input
+                    type="number"
+                    name="price"
+                    placeholder="Price"
+                    value={med.price}
+                    onChange={(e) => handleChange(e, "medicines", "price", idx)}
+                    className="rounded-md border border-gray-300 px-3 py-2 text-base text-[#1C1F26]"
+                  />
+                </div>
+              ))}
+            </ScrollArea>
+            <Button
+              variant="outline"
+              className="mt-3 border-[#76C7C0] text-[#2E86AB] hover:bg-[#76C7C0] hover:text-white transition"
+              onClick={addMedicine}
+              type="button"
+            >
+              Add Medicine
+            </Button>
+          </div>
+
+          {/* Submit */}
+          <div className="mt-10">
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="bg-[#2E86AB] hover:bg-[#1B5F73] text-white px-8 py-3 rounded-2xl transition"
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 

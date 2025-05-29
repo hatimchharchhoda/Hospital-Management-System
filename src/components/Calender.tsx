@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { format, addDays } from 'date-fns';
+import { toast } from '@/hooks/use-toast';
 
 type CalendarProps = {
   onSelectDate: (date: string) => void;
@@ -18,9 +19,20 @@ const Calendar = ({ onSelectDate, refreshSignal }: CalendarProps) => {
   }, []);
 
   const fetchFullDates = async () => {
-    const res = await fetch('/api/appointment/full');
-    const data = await res.json();
-    setFullDays(data.fullDates);
+    try {
+      const res = await fetch('/api/appointment/full');
+      const data = await res.json();
+      if (!res.ok || !data.success || !Array.isArray(data.fullDates)) {
+        console.error('Invalid response from /api/appointment/full:', data);
+        setFullDays([]); // set empty instead of undefined
+        return;
+      }
+      setFullDays(data.fullDates);
+    } catch (error) {
+      toast({ title: 'Error', description:'Failed to load appointment data.', variant: 'destructive' });
+      console.error('Fetch fullDates failed:', error);
+      setFullDays([]); // set to empty array on error
+    }
   };
 
   useEffect(() => {
@@ -36,25 +48,31 @@ const Calendar = ({ onSelectDate, refreshSignal }: CalendarProps) => {
   });
 
   return (
-    <div className="space-y-8 mt-6">
+    <div className="space-y-10 mt-6">
       {Object.entries(groupedByMonth).map(([monthYear, monthDates]) => (
         <div key={monthYear}>
-          <h2 className="text-xl font-semibold mb-4">{monthYear}</h2>
-          <div className="grid grid-cols-6 gap-4">
+          <h2 className="text-2xl font-semibold text-[#2E86AB] mb-4">
+            {monthYear}
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
             {monthDates.map((date) => {
               const dateStr = format(date, 'yyyy-MM-dd');
-              const isFull = fullDays.includes(dateStr);
+              const isFull = Array.isArray(fullDays) && fullDays.includes(dateStr);
 
               return (
                 <div
                   key={dateStr}
                   onClick={() => onSelectDate(dateStr)}
                   className={cn(
-                    'rounded-xl p-4 cursor-pointer shadow-sm hover:bg-muted text-center',
-                    isFull ? 'bg-red-200 text-red-800' : 'bg-white'
+                    'rounded-2xl p-4 cursor-pointer shadow-sm text-center transition-colors duration-200',
+                    isFull
+                      ? 'bg-[#F4D35E] text-[#1C1F26] font-semibold'
+                      : 'bg-[#F5F9FF] hover:bg-[#76C7C0]/20 text-[#1C1F26]'
                   )}
                 >
-                  <div className="font-semibold text-lg">{format(date, 'dd')}</div>
+                  <div className="text-lg font-medium">
+                    {format(date, 'dd')}
+                  </div>
                 </div>
               );
             })}

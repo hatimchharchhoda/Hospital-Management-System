@@ -80,7 +80,8 @@ export default function SignUpForm() {
       setIsSubmitting(false);
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
-      const errorMessage = axiosError.response?.data.message ||
+      const errorMessage =
+        axiosError.response?.data.message ||
         'There was a problem with your sign-up. Please try again.';
       toast({
         title: 'Sign Up Failed',
@@ -96,24 +97,26 @@ export default function SignUpForm() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#e0f2fe] via-[#f8fafc] to-[#dbeafe] px-4"
+      className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#F5F9FF] via-[#E9F2FA] to-[#D6E9FC] px-4"
     >
       <motion.div
-        initial={{ y: -50, opacity: 0 }}
+        initial={{ y: -30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, type: 'spring' }}
-        className="relative w-full max-w-md p-8 space-y-6 bg-white/60 backdrop-blur-md border border-gray-200 rounded-3xl shadow-2xl transition-all duration-300 ease-in-out hover:scale-[1.01]"
+        className="relative w-full max-w-md p-6 md:p-8 space-y-8 bg-white shadow-lg border border-[#D0E4F7] rounded-2xl backdrop-blur-sm"
       >
         <div className="text-center">
           <motion.h1
-            className="text-5xl font-extrabold text-gray-800 tracking-tight mb-3 animate-fade-in"
-            initial={{ scale: 0.9 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
+            className="text-2xl md:text-3xl font-semibold text-[#1C1F26] tracking-wide mb-2"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.4 }}
           >
-            TweetConnect
+            MediConnect
           </motion.h1>
-          <p className="text-gray-600 text-sm md:text-base">Sign up to connect and tweet in real-time</p>
+          <p className="text-base text-[#2E86AB]">
+            Create your account to manage hospital operations seamlessly
+          </p>
         </div>
 
         <Form {...form}>
@@ -123,7 +126,9 @@ export default function SignUpForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700">Username</FormLabel>
+                  <FormLabel className="text-sm text-muted-foreground">
+                    Username
+                  </FormLabel>
                   <Input
                     {...field}
                     placeholder="john_doe"
@@ -131,15 +136,17 @@ export default function SignUpForm() {
                       field.onChange(e);
                       debounced(e.target.value);
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-2 rounded-2xl border border-[#76C7C0] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] transition duration-300 ease-in-out"
                   />
-                  {isCheckingUsername && <Loader2 className="animate-spin mt-1 text-gray-600" />}
+                  {isCheckingUsername && (
+                    <Loader2 className="animate-spin mt-1 text-[#76C7C0]" />
+                  )}
                   {!isCheckingUsername && usernameMessage && (
                     <p
-                      className={`mt-1 text-sm transition-all duration-300 ${
+                      className={`mt-1 text-sm transition-colors duration-300 ${
                         usernameMessage === 'Username is unique'
-                          ? 'text-green-500'
-                          : 'text-red-500'
+                          ? 'text-green-600'
+                          : 'text-yellow-600'
                       }`}
                     >
                       {usernameMessage}
@@ -154,11 +161,13 @@ export default function SignUpForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700">Hospital Name</FormLabel>
+                  <FormLabel className="text-sm text-muted-foreground">
+                    Hospital Name
+                  </FormLabel>
                   <Input
                     {...field}
                     placeholder="City Health Hospital"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-2 rounded-2xl border border-[#76C7C0] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] transition duration-300 ease-in-out"
                   />
                   <FormMessage />
                 </FormItem>
@@ -169,11 +178,13 @@ export default function SignUpForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700">Email</FormLabel>
+                  <FormLabel className="text-sm text-muted-foreground">
+                    Email
+                  </FormLabel>
                   <Input
                     {...field}
                     placeholder="you@example.com"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                    className="w-full px-4 py-2 rounded-2xl border border-[#76C7C0] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] transition duration-300 ease-in-out"
                   />
                   <FormMessage />
                 </FormItem>
@@ -184,17 +195,25 @@ export default function SignUpForm() {
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-gray-700">Password</FormLabel>
+                  <FormLabel className="text-sm text-muted-foreground">
+                    Password
+                  </FormLabel>
                   <div className="relative">
                     <Input
                       type={showPassword ? 'text' : 'password'}
                       {...field}
                       placeholder="••••••••"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all duration-300"
+                      className="w-full px-4 py-2 rounded-2xl border border-[#76C7C0] focus:outline-none focus:ring-2 focus:ring-[#2E86AB] transition duration-300 ease-in-out"
                     />
                     <div
                       onClick={() => setShowPassword((prev) => !prev)}
-                      className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-gray-500"
+                      className="absolute inset-y-0 right-3 flex items-center cursor-pointer text-[#2E86AB] hover:text-[#76C7C0] transition-colors"
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') setShowPassword((prev) => !prev);
+                      }}
                     >
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </div>
@@ -203,15 +222,19 @@ export default function SignUpForm() {
                 </FormItem>
               )}
             />
-            <motion.div whileHover={{ scale: 1.05 }} transition={{ type: 'spring', stiffness: 300 }}>
+            <motion.div
+              whileHover={{ scale: 1.05, boxShadow: '0 0 8px #76C7C0' }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: 'spring', stiffness: 300 }}
+            >
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-xl font-medium transition-transform transform hover:scale-105 focus:ring-2 focus:ring-offset-2 focus:ring-blue-400"
+                className="w-full bg-[#2E86AB] hover:bg-[#247799] text-white py-3 rounded-2xl font-semibold transition-shadow focus:ring-4 focus:ring-offset-2 focus:ring-[#76C7C0]"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin inline-block" />
                     Please wait
                   </>
                 ) : (
@@ -223,11 +246,11 @@ export default function SignUpForm() {
         </Form>
 
         <div className="text-center mt-6">
-          <p className="text-gray-600">
+          <p className="text-base text-[#1C1F26]">
             Already a member?{' '}
             <Link
               href="/signin"
-              className="text-blue-600 hover:underline"
+              className="text-[#76C7C0] hover:underline focus:outline-none focus:ring-2 focus:ring-[#F4D35E]"
             >
               Sign in
             </Link>

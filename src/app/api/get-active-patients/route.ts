@@ -23,7 +23,7 @@ export async function GET() {
       .sort({ dateOfAdmission: -1 })
       .lean();
 
-    return NextResponse.json({ success: true, patients: activePatients }, { status: 200 });
+    return NextResponse.json({ success: true, patients: activePatients, message: "Patients fetched successfully" }, { status: 200 });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
