@@ -36,13 +36,21 @@ export async function POST(req: Request) {
     // Calculate costs
     let doctorFees = 0, roomCost = 0, operationCost = 0, otherCharges = 0;
     let bottleCost = 0, injectionCost = 0, medicineCost = 0;
+    let treatmentFor = treatmentRecords
+    .map(r => r.treatmentFor || "")
+    .filter(str => str.trim() !== "")
+    .join(", ")
+    .trim();
+
+    if (treatmentFor === "") {
+      treatmentFor = "Not specified";
+    }
 
     for (const record of treatmentRecords) {
       doctorFees += record.doctorFees || 0;
       roomCost += record.room?.roomPrice || 0;
       operationCost += record.operationCost || 0;
       otherCharges += record.otherCost || 0;
-
       bottleCost += (record.bottles?.count || 0) * (record.bottles?.price || 0);
       injectionCost += (record.injections?.count || 0) * (record.injections?.price || 0);
 
@@ -58,10 +66,12 @@ export async function POST(req: Request) {
     const dateOfAdmission = pendingPatient.dateOfAdmission;
     const dateOfDischarge = treatmentRecords[treatmentRecords.length - 1].date || new Date();
 
+    console.log("Final treatmentFor:", treatmentFor);
     const admissionSummary: AdmissionSummary = {
       dateOfAdmission,
       dateOfDischarge,
       assignedDoctorName: pendingPatient.assignedDoctorName || null,
+      treatmentFor,
       doctorFees,
       roomCost,
       operationCost,
@@ -73,7 +83,7 @@ export async function POST(req: Request) {
     };
 
     // Check if old patient
-    const existingPatient = await PatientsRecordModel.findOne({ patient, hospitalId });
+    const existingPatient = await PatientsRecordModel.findOne({ patientId:patient, hospitalId });
 
     if (existingPatient) {
       existingPatient.admissions.push(admissionSummary);

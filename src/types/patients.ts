@@ -1,7 +1,7 @@
 import { Medicine } from './treatment';
 
 export type TreatmentRecord = {
-  treatment_for: string;
+  treatmentFor: string;
   date: string;
   room?: {
     roomNo?: string;

@@ -14,6 +14,7 @@ export interface PatientType extends Document {
 
 export interface TreatmentRecordType {
   date: Date;
+  treatmentFor?: string | null;
   room?: {
     roomNo?: string;
     bedNo?: string;
@@ -94,14 +95,14 @@ const PatientSchema: Schema<PatientType> = new mongoose.Schema({
 
   treatmentRecords: [
     {
-      treatment_for: { type: String, required: true },
+      treatmentFor: { type: String, default: null },
       date: { type: Date, required: true },
       room: {
         roomNo: { type: String, default: null },
         bedNo: { type: String, default: null },
         roomCategory: {
           type: String,
-          enum: ['general', 'semi-private', 'private', 'null', 'ICU'],
+          enum: ['general', 'semi-private', 'private', 'ICU','null'],
           default: 'null',
         },
         roomPrice: { type: Number, default: 0 },

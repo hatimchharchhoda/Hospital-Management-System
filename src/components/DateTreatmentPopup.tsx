@@ -49,7 +49,7 @@ export default function DateTreatmentPopup({ patientId, record, onClose }: Props
     room: {
       roomNo: record.room?.roomNo ?? '',
       bedNo: record.room?.bedNo ?? '',
-      roomCategory: record.room?.roomCategory ?? '',
+      roomCategory: record.room?.roomCategory ?? 'null',
       roomPrice: record.room?.roomPrice ?? '',
     },
     bottles: {
@@ -149,7 +149,7 @@ export default function DateTreatmentPopup({ patientId, record, onClose }: Props
               }
               className="w-full border px-3 py-1 rounded"
             >
-              <option value="">Select Category</option>
+              <option defaultValue="null">Select Category</option>
               <option value="general">General</option>
               <option value="semi-private">Semi-private</option>
               <option value="private">Private</option>

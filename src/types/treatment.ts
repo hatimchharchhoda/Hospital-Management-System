@@ -22,7 +22,7 @@ export interface PatientFormData {
   name: string;
   mobile: string;
   address: string;
-  treatment_for: string;
+  treatmentFor: string;
   date: string;
   room: Room;
   bottles: BottlesOrInjections;

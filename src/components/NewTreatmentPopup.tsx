@@ -11,7 +11,7 @@ interface Props {
 
 export default function NewTreatmentPopup({ patientId, onClose, onSuccess }: Props) {
   const [form, setForm] = useState<TreatmentRecord>({
-    treatment_for: '',
+    treatmentFor: '',
     date: '',
     room: {
       roomNo: '',
@@ -100,8 +100,8 @@ export default function NewTreatmentPopup({ patientId, onClose, onSuccess }: Pro
           <input
             type="text"
             className="w-full border px-3 py-1 rounded"
-            value={form.treatment_for}
-            onChange={(e) => setForm({ ...form, treatment_for: e.target.value })}
+            value={form.treatmentFor}
+            onChange={(e) => setForm({ ...form, treatmentFor: e.target.value })}
           />
         </div>
 

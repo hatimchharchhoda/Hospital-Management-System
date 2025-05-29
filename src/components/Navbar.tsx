@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button'
 import { motion } from 'framer-motion'
 
 const navLinks = [
-  { href: '/', label: 'Home', icon: <Home size={18} /> },
+  { href: '/Home', label: 'Home', icon: <Home size={18} /> },
   { href: '/Active_Patient', label: 'Active Patients', icon: <BedDouble size={18} /> },
   { href: '/Admission', label: 'Admission', icon: <Stethoscope size={18} /> },
   { href: '/Appointment', label: 'Appointment', icon: <CalendarClock size={18} /> },

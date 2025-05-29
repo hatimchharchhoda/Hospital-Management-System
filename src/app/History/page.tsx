@@ -13,7 +13,7 @@ interface AdmissionSummary {
   dateOfDischarge?: string;
   assignedDoctorName?: string;
   totalBill: number;
-
+  treatmentFor: string;
   doctorFees?: number;
   bottleCost?: number;
   injectionCost?: number;
@@ -102,6 +102,7 @@ export default function PatientHistoryPage() {
                         ["Name", patient.name],
                         ["Address", patient.address],
                         ["Mobile", patient.mobile],
+                        ["Treatment For", admission.treatmentFor || "N/A"],
                         [
                           "Date of Admission",
                           new Date(admission.dateOfAdmission).toLocaleDateString(),

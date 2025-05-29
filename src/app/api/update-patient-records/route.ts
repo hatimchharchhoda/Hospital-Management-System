@@ -69,7 +69,7 @@ export async function PUT(req: Request) {
     );
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    console.error('Error updating treatment:', error);
+    console.error("Server error:", error); 
     return NextResponse.json(
       { success: false, message: 'Internal Server Error', error: error.message },
       { status: 500 }

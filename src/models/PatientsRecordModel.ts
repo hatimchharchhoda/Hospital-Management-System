@@ -3,7 +3,8 @@ import mongoose, { Schema, Document } from 'mongoose';
 export interface AdmissionSummary {
   dateOfAdmission: Date;
   dateOfDischarge?: Date;
-  assignedDoctorName?: string | null; // Moved here
+  assignedDoctorName?: string | null;
+  treatmentFor: string;
   doctorFees: number;
   bottleCost: number;
   injectionCost: number;
@@ -26,7 +27,8 @@ export interface PatientSummaryType extends Document {
 const AdmissionSummarySchema = new Schema<AdmissionSummary>({
   dateOfAdmission: { type: Date, required: true },
   dateOfDischarge: { type: Date, default: null },
-  assignedDoctorName: { type: String, default: null }, // Added here
+  assignedDoctorName: { type: String, default: null },
+  treatmentFor: { type: String, required: false, default: 'not specified' },
   doctorFees: { type: Number, default: 0 },
   bottleCost: { type: Number, default: 0 },
   injectionCost: { type: Number, default: 0 },
