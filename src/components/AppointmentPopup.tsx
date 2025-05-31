@@ -71,7 +71,7 @@ export const AppointmentPopup = ({
               mode === 'update' && selectedAppointment
                 ? {
                     appointmentId: selectedAppointment?._id,
-                    appointmentDate: selectedAppointment?.appointmentDate.slice(0, 10),
+                    appointmentDate: date,
                     appointmentTime: selectedAppointment?.appointmentTime,
                   }
                 : { appointmentDate: date, appointmentTime: '' }

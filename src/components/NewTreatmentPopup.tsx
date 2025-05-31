@@ -97,7 +97,7 @@ export default function NewTreatmentPopup({ patientId, onClose, onSuccess }: Pro
     } catch (err) {
       toast({
         title: "Error",
-        description:"Error adding new day patient record",
+        description: "Error adding new day patient record",
         variant: "destructive",
       });
       console.error("Error saving record:", err);
@@ -192,6 +192,13 @@ export default function NewTreatmentPopup({ patientId, onClose, onSuccess }: Pro
             <option value="private">Private</option>
             <option value="ICU">ICU</option>
           </select>
+          <div className="col-span-2">
+            <Input
+              placeholder="Room Price"
+              type="number"
+              onChange={(e) => setForm({ ...form, room: { ...form.room!, roomPrice: Number(e.target.value) }})}
+            />
+          </div>
         </div>
 
         {/* Bottles & Injections */}

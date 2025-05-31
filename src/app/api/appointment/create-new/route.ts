@@ -18,6 +18,14 @@ export async function POST(req: Request) {
     const date = new Date(appointmentDate);
     date.setHours(0, 0, 0, 0);
 
+    if (!appointmentDate) {
+      return NextResponse.json({ success: false, message: "Date is required" }, { status: 400 });
+    }
+
+    if (!appointmentTime) {
+      return NextResponse.json({ success: false, message: "Time is required" }, { status: 400 });
+    }
+
     // Check for duplicate time on the same day
     const existingSameTime = await AppointmentModel.findOne({
       hospitalId,
@@ -37,6 +45,21 @@ export async function POST(req: Request) {
 
     if (countForDate >= 15) {
       return NextResponse.json({ success: false, message: "Max 15 appointments reached for the day." }, { status: 400 });
+    }
+
+    if (!patientName) {
+      return NextResponse.json({ success: false, message: "Patient name is required." }, { status: 400 });
+    }
+
+    if (!mobile) {
+      return NextResponse.json({ success: false, message: "Mobile number is required." }, { status: 400 });
+    }
+
+    if (!/^\d{10}$/.test(mobile)) {
+      return NextResponse.json(
+        { success: false, message: "Mobile number must be exactly 10 digits" },
+        { status: 400 }
+      );
     }
 
     // Delete past appointments

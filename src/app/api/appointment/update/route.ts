@@ -18,6 +18,14 @@ export async function PUT(req: Request) {
     const date = new Date(newDate);
     date.setHours(0, 0, 0, 0);
 
+    if (!newDate) {
+      return NextResponse.json({ success: false, message: "Date is required" }, { status: 400 });
+    }
+
+    if (!newTime) {
+      return NextResponse.json({ success: false, message: "Time is required" }, { status: 400 });
+    }
+
     // Check for duplicate time on the same day
     const existing = await AppointmentModel.findOne({
       _id: { $ne: appointmentId },

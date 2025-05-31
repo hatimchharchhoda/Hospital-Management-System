@@ -33,7 +33,7 @@ export interface PatientFormData {
   name: string;
   mobile: string;
   address: string;
-  treatment_for: string;
+  treatmentFor: string;
   date: string;
   room: Room;
   bottles: BottlesOrInjections;
@@ -53,7 +53,7 @@ interface Props {
 
 export default function DateTreatmentPopup({ patientId, record, onClose }: Props) {
   const [form, setForm] = useState<Partial<PatientFormData>>({
-    treatment_for: record.treatment_for ?? '',
+    treatmentFor: record.treatmentFor ?? '',
     room: {
       roomNo: record.room?.roomNo ?? '',
       bedNo: record.room?.bedNo ?? '',
@@ -96,7 +96,6 @@ export default function DateTreatmentPopup({ patientId, record, onClose }: Props
       toast({
         title: "Error",
         description: "Error while updating records",
-        variant: "destructive",
       });
       console.error('Update error:', err);
     }
@@ -116,7 +115,7 @@ export default function DateTreatmentPopup({ patientId, record, onClose }: Props
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 bg-opacity-40 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
