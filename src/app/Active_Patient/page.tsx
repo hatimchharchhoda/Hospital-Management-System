@@ -7,11 +7,13 @@ import PatientDetailsModal from '@/components/PatientDetailsModal';
 import { Patient } from '@/types/patients';
 import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useRouter } from 'next/navigation';
 
 export default function ActivePatientsPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   const fetchPatients = async () => {
     try {
@@ -45,6 +47,7 @@ export default function ActivePatientsPage() {
           title: "Success",
           description: res.data.message || "Patient discharged successfully",
         });
+       router.push('/History');
     } catch (err) {
       toast({
           title: "Error",

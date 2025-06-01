@@ -44,6 +44,7 @@ export const AppointmentPopup = ({
 
   useEffect(() => {
     fetchAppointments();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
 
   const handleSuccess = async () => {

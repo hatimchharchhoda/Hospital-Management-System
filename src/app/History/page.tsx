@@ -93,14 +93,14 @@ export default function PatientHistoryPage() {
             : "N/A",
         ],
         ["Doctor Assigned", admission.assignedDoctorName || "N/A"],
-        ["Doctor Fees", `₹${admission.doctorFees ?? 0}`],
-        ["Bottle Cost", `₹${admission.bottleCost ?? 0}`],
-        ["Injection Cost", `₹${admission.injectionCost ?? 0}`],
-        ["Room Cost", `₹${admission.roomCost ?? 0}`],
-        ["Medicine Cost", `₹${admission.medicineCost ?? 0}`],
-        ["Operation Cost", `₹${admission.operationCost ?? 0}`],
-        ["Other Charges", `₹${admission.otherCharges ?? 0}`],
-        ["Total Bill", `₹${admission.totalBill}`],
+        ["Doctor Fees", `${admission.doctorFees ?? 0}/-`],
+        ["Bottle Cost", `${admission.bottleCost ?? 0}/-`],
+        ["Injection Cost", `${admission.injectionCost ?? 0}/-`],
+        ["Room Cost", `${admission.roomCost ?? 0}/-`],
+        ["Medicine Cost", `${admission.medicineCost ?? 0}/-`],
+        ["Operation Cost", `${admission.operationCost ?? 0}/-`],
+        ["Other Charges", `${admission.otherCharges ?? 0}/-`],
+        ["Total Bill", `${admission.totalBill} INR`],
       ],
     });
 
@@ -218,7 +218,7 @@ export default function PatientHistoryPage() {
                             onClick={() => generatePDF(patient, admission)}
                             className="bg-[#76C7C0] text-white hover:bg-[#5aa9a4] transition-colors"
                           >
-                            Generate PDF
+                            Generate Bill
                           </Button>
                         </div>
                       </Card>

@@ -2,7 +2,7 @@
 
 import { PatientFormData } from "@/types/treatment";
 import React, { useState } from "react";
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { motion } from "framer-motion";
 import {
   Card,
@@ -18,6 +18,7 @@ import { toast } from "@/hooks/use-toast";
 
 const PatientAdmissionForm = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [formData, setFormData] = useState<PatientFormData>({
     patientId: "",
     assignedDoctorName: "",
@@ -118,6 +119,7 @@ const PatientAdmissionForm = () => {
           title: "Success",
           description: data.message ||"Patient admitted successfully",
         });
+         router.push('/Active_Patient');
       } else {
         toast({
           title: "Error",

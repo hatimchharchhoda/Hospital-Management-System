@@ -111,7 +111,7 @@ const Navbar = () => {
               </div>
               <DropdownMenuItem asChild>
                 <Link
-                  href="/profile"
+                  href="/Profile"
                   className="flex items-center gap-2 text-base text-[${colors.textDark}] hover:bg-[${colors.accentAqua}] hover:text-white rounded-lg px-2 py-1 transition-colors"
                   style={{ borderRadius: '0.5rem' }}
                 >
