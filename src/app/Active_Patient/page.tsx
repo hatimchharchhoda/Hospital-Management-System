@@ -19,10 +19,6 @@ export default function ActivePatientsPage() {
     try {
       const res = await axios.get('/api/get-active-patients');
       setPatients(res.data.patients);
-      toast({
-          title: "Success",
-          description: res.data.message || "Fetched patients successfully",
-        });
     } catch (error) {
       toast({
           title: "Error",
@@ -43,10 +39,6 @@ export default function ActivePatientsPage() {
     try {
       const res = await axios.post('/api/discharge-patient', { patientId });
       fetchPatients();
-      toast({
-          title: "Success",
-          description: res.data.message || "Patient discharged successfully",
-        });
        router.push('/History');
     } catch (err) {
       toast({

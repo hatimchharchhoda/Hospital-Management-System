@@ -55,11 +55,6 @@ export default function SignInForm() {
       setIsSubmitting(false);
     } else {
       router.replace('/Home');
-      toast({
-        title: 'Login Successful',
-        description: 'Redirecting to home page',
-        variant: 'default',
-      });
     }
 
     const session = await getSession();
